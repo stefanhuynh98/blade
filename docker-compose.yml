@@ -1,0 +1,34 @@
+services:
+
+  payload:
+    build: ./payload
+    working_dir: /app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URI: "mongodb://mongo:27017/payload"
+      PAYLOAD_SECRET: ${BLADE_JWT_SECRET}
+    volumes:
+      - ./payload:/app
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+        - "80:80"
+    volumes:
+      - ./.config/nginx/templates:/etc/nginx/templates
+    depends_on:
+      - payload
+    environment:
+        BLADE_NAME: ${BLADE_NAME}
+        BLADE_ADMIN: ${BLADE_ADMIN}
