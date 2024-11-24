@@ -1,34 +1,47 @@
 services:
 
-  payload:
-    build: ./payload
-    working_dir: /app
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URI: "mongodb://mongo:27017/payload"
-      PAYLOAD_SECRET: ${BLADE_JWT_SECRET}
-    volumes:
-      - ./payload:/app
-    depends_on:
-      - mongo
+    payload:
+        build: ./payload
+        working_dir: /app
+        restart: always
+        env_file: ".env"
+        environment:
+            DATABASE_URI: "mongodb://mongo:27017/payload"
+        volumes:
+            - ./payload:/app
+            - /app/node_modules
+        depends_on:
+            - mongo
 
-  mongo:
-    image: mongo:latest
-    restart: always
-    ports:
-      - "27017:27017"
+    mongo:
+        image: mongo:latest
+        restart: always
+        volumes:
+            - db_data:/data/db
 
-  nginx:
-    image: nginx:latest
-    restart: always
-    ports:
-        - "80:80"
-    volumes:
-      - ./.config/nginx/templates:/etc/nginx/templates
-    depends_on:
-      - payload
-    environment:
-        BLADE_NAME: ${BLADE_NAME}
-        BLADE_ADMIN: ${BLADE_ADMIN}
+    web:
+        build: ./web
+        restart: always
+        depends_on:
+            - payload
+        volumes:
+            - ./web:/home/node/app
+            - /home/node/app/node_modules
+        env_file: ".env"
+        environment:
+            DATABASE_URI: "mongodb://mongo:27017/payload"
+
+    nginx:
+        image: nginx:latest
+        restart: always
+        ports:
+            - "80:80"
+        volumes:
+            - ./.config/nginx/templates:/etc/nginx/templates
+        depends_on:
+            - payload
+            - web
+        env_file: ".env"
+
+volumes:
+    db_data:

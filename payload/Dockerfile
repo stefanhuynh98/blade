@@ -1,11 +1,7 @@
-FROM node:23-alpine3.19
+FROM node:23-alpine3.20
 
-COPY package.json .
+COPY package*.json .
 
-COPY pnpm-lock.yaml .
+RUN npm i --legacy-peer-deps
 
-RUN npm i -g pnpm
-
-RUN pnpm i
-
-CMD ["pnpm", "dev"]
+CMD ["npm", "run", "dev", "--turbo"]
