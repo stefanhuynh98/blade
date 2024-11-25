@@ -9,5 +9,3 @@ COPY --chown=node:node package*.json .
 RUN npm i
 
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
-
-# CMD ["tail", "-f", "/dev/null"]

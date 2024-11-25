@@ -1,6 +1,11 @@
 <script lang="ts">
-	import '../app.css';
-	let { children } = $props();
+    import '@fontsource-variable/sora';
+    import '../app.css';
+    import { NavBar } from '$lib/ui/index';
+
+    let { children } = $props();
 </script>
+
+<NavBar />
 
 {@render children()}
